@@ -390,7 +390,7 @@ html{scroll-padding-top:100px}
 </section>
 </main>
 <button aria-label="Remonter en haut de la page" class="up" id="up">Haut<br/>↑</button>
-<section class="quote-section" id="contact"><div class="wrap premium-section quote-grid"><div class="quote-info"><p class="premium-kicker-light">PARLONS DE VOTRE PROJET</p><h2 class="display">Imaginons ensemble un moment unique.</h2><p class="premium-lead">Quelques informations suffisent pour préparer une première proposition adaptée à votre événement.</p><p>Vous ne connaissez pas encore les objets à graver ? Aucun problème : nous pouvons les imaginer ensemble.</p></div><form class="quote-form" id="braiseEventForm"><div class="field"><label for="bEvent">Type d'événement *</label><select id="bEvent" name="event" required=""><option value="">Choisir un type</option><option>Entreprise / marque</option><option>Agence événementielle / luxe</option><option>Mariage / célébration</option><option>Autre événement</option></select></div><div class="form-grid"><div class="field"><label for="bDate">Date envisagée</label><input id="bDate" name="date" type="date"/></div><div class="field"><label for="bGuests">Nombre d'invités</label><input id="bGuests" min="1" name="guests" placeholder="Ex. 100" type="number"/></div></div><div class="field"><label for="bPlace">Lieu de l'événement</label><input id="bPlace" name="place" placeholder="Ville, établissement..."/></div><div class="field"><label for="bObjects">Objets à personnaliser</label><input id="bObjects" name="objects" placeholder="Verres, bois, stylos, à définir..."/></div><div class="form-grid"><div class="field"><label for="bName">Nom / société *</label><input autocomplete="name" id="bName" name="name" required=""/></div><div class="field"><label for="bEmail">Adresse e-mail *</label><input autocomplete="email" id="bEmail" name="email" required="" type="email"/></div></div><div class="field"><label for="bMessage">Votre projet</label><textarea id="bMessage" name="message" placeholder="Vos envies, vos contraintes, vos idées..."></textarea></div><div class="field"><label><input id="bConsent" required="" style="width:auto;margin-right:8px" type="checkbox"/>J'accepte que les informations saisies soient utilisées pour répondre à ma demande. *</label></div><button class="premium-btn primary" type="submit">Préparer ma demande ↗</button><p aria-live="polite" class="note" id="braiseFormStatus" role="status">Votre demande sera transmise directement à BRAISE après validation du formulaire.</p><p class="note">* Champs obligatoires. Avant publication, ajouter la politique de confidentialité et connecter un service d'envoi sécurisé.</p></form></div></section><footer>
+<section class="quote-section" id="contact"><div class="wrap premium-section quote-grid"><div class="quote-info"><p class="premium-kicker-light">PARLONS DE VOTRE PROJET</p><h2 class="display">Imaginons ensemble un moment unique.</h2><p class="premium-lead">Quelques informations suffisent pour préparer une première proposition adaptée à votre événement.</p><p>Vous ne connaissez pas encore les objets à graver ? Aucun problème : nous pouvons les imaginer ensemble.</p></div><form class="quote-form" id="braiseEventForm"><div class="field"><label for="bEvent">Type d'événement *</label><select id="bEvent" name="event" required=""><option value="">Choisir un type</option><option>Entreprise / marque</option><option>Agence événementielle / luxe</option><option>Mariage / célébration</option><option>Autre événement</option></select></div><div class="form-grid"><div class="field"><label for="bDate">Date envisagée</label><input id="bDate" name="date" type="date"/></div><div class="field"><label for="bGuests">Nombre d'invités</label><input id="bGuests" min="1" name="guests" placeholder="Ex. 100" type="number"/></div></div><div class="field"><label for="bPlace">Lieu de l'événement</label><input id="bPlace" name="place" placeholder="Ville, établissement..."/></div><div class="field"><label for="bObjects">Objets à personnaliser</label><input id="bObjects" name="objects" placeholder="Verres, bois, stylos, à définir..."/></div><div class="form-grid"><div class="field"><label for="bName">Nom / société *</label><input autocomplete="name" id="bName" name="name" required=""/></div><div class="field"><label for="bEmail">Adresse e-mail *</label><input autocomplete="email" id="bEmail" name="email" required="" type="email"/></div></div><div class="field"><label for="bMessage">Votre projet</label><textarea id="bMessage" name="message" placeholder="Vos envies, vos contraintes, vos idées..."></textarea></div><div class="field"><label><input id="bConsent" required="" style="width:auto;margin-right:8px" type="checkbox"/>J'accepte que les informations saisies soient utilisées pour répondre à ma demande. *</label></div><div class="field"><div class="cf-turnstile" data-sitekey="0x4AAAAAAFzvvU0Rm3NDJ9IU" data-theme="auto" data-callback="braiseTurnstileVerified" data-expired-callback="braiseTurnstileExpired" data-error-callback="braiseTurnstileExpired"></div></div><button class="premium-btn primary" type="submit">Préparer ma demande ↗</button><p aria-live="polite" class="note" id="braiseFormStatus" role="status">Votre demande sera transmise directement à BRAISE après validation du formulaire.</p><p class="note">* Champs obligatoires. Avant publication, ajouter la politique de confidentialité et connecter un service d'envoi sécurisé.</p></form></div></section><footer>
 <div class="wrap">
 <div class="foot">
 <div><h4>Boutique</h4><ul><li><a href="#produits">Toutes les pièces</a></li><li><a href="#collection">Collection Charbon</a></li><li><a href="#">Sur mesure</a></li><li><a href="#">Cartes cadeaux</a></li></ul></div>
@@ -758,6 +758,8 @@ setTimeout(()=>{if(step===0&&!seen.has("hover")&&!g.classList.contains("peek")){
 <script>
 /* BRAISE — Envoi du formulaire via Cloudflare Worker / Resend. Clé API conservée côté serveur. */
 const BRAISE_FORM_API_URL = 'https://braise-form-api.c-granet.workers.dev/';
+window.braiseTurnstileVerified = function () {};
+window.braiseTurnstileExpired = function () {};
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('braiseEventForm');
   if (!form) return;
@@ -767,8 +769,14 @@ document.addEventListener('DOMContentLoaded', function () {
     event.preventDefault();
     if (!form.reportValidity()) return;
 
+    const turnstileToken = window.turnstile?.getResponse(form.querySelector('.cf-turnstile'));
+    if (!turnstileToken) {
+      status.textContent = 'Veuillez patienter pendant la vérification de sécurité, puis réessayer.';
+      return;
+    }
     const data = Object.fromEntries(new FormData(form).entries());
     const payload = {
+      turnstileToken,
       nom: String(data.name || '').trim(),
       email: String(data.email || '').trim(),
       telephone: '',
@@ -793,13 +801,15 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!response.ok) throw new Error('Erreur serveur : ' + response.status);
       status.textContent = 'Votre demande a bien été envoyée ! Nous vous répondrons dès que possible.';
       form.reset();
+      window.turnstile?.reset(form.querySelector('.cf-turnstile'));
     } catch (error) {
       status.textContent = 'L’envoi a échoué. Veuillez réessayer ou écrire à contact@atelier-braise.fr.';
     } finally {
+      window.turnstile?.reset(form.querySelector('.cf-turnstile'));
       button.disabled = false;
       button.textContent = 'Préparer ma demande ↗';
     }
   });
 });
-</script></body>
+</script><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script></body>
 </html>
