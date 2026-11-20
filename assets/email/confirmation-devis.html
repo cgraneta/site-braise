@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Votre demande est bien partie — BRAISE</title>
+<!--
+  Modèle d'e-mail de confirmation BRAISE.
+  À brancher dans le Cloudflare Worker (envoi via Resend) après une demande réussie.
+  Variables à remplacer côté Worker (texte échappé en HTML) :
+  {{nom}} {{evenement}} {{date}} {{lieu}} {{participants}} {{prestation}} {{message}}
+  Le logo doit être servi en PNG à cette adresse : https://atelier-braise.fr/assets/img/logo-email.png
+-->
+</head>
+<body style="margin:0;padding:0;background:#1B1916;">
+<div style="display:none;max-height:0;overflow:hidden;">Merci {{nom}}, nous avons bien reçu votre demande.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1B1916;">
+  <tr><td align="center" style="padding:32px 16px;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#24211E;border:1px solid #3A352F;">
+      <tr><td align="left" style="padding:40px 48px 24px;">
+        <img src="https://atelier-braise.fr/assets/img/logo-email.png" width="180" height="62" alt="BRAISE" style="display:block;border:0;width:180px;height:auto;">
+      </td></tr>
+      <tr><td style="padding:0 48px;"><div style="width:48px;height:2px;background:#D83A27;line-height:2px;font-size:0;">&nbsp;</div></td></tr>
+      <tr><td style="padding:28px 48px 8px;font-family:Marcellus,Georgia,'Times New Roman',serif;font-size:34px;line-height:1.15;color:#F5F0E5;">Votre demande est bien partie.</td></tr>
+      <tr><td style="padding:12px 48px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#E0D2C5;">
+        Bonjour {{nom}},<br><br>
+        Merci pour votre demande. Nous l’étudions et revenons vers vous avec une première proposition et, si besoin, quelques questions sur votre événement.
+      </td></tr>
+      <tr><td style="padding:28px 48px 0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #3A352F;">
+          <tr><td style="padding:16px 0 6px;font-family:Inter,Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#C9C1B6;" colspan="2">Récapitulatif</td></tr>
+          <tr><td style="padding:6px 0;width:42%;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#C9C1B6;">Événement</td><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#F5F0E5;">{{evenement}}</td></tr>
+          <tr><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#C9C1B6;">Date envisagée</td><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#F5F0E5;">{{date}}</td></tr>
+          <tr><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#C9C1B6;">Lieu</td><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#F5F0E5;">{{lieu}}</td></tr>
+          <tr><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#C9C1B6;">Participants</td><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#F5F0E5;">{{participants}}</td></tr>
+          <tr><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#C9C1B6;">Prestation</td><td style="padding:6px 0;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#F5F0E5;">{{prestation}}</td></tr>
+          <tr><td style="padding:14px 0 6px;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;color:#C9C1B6;" colspan="2">Votre projet</td></tr>
+          <tr><td style="padding:0 0 8px;font-family:Inter,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#F5F0E5;" colspan="2">{{message}}</td></tr>
+        </table>
+      </td></tr>
+      <tr><td style="padding:28px 48px 0;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:22px;line-height:1.3;color:#F5F0E5;">« Le souvenir le plus fort est celui qu’on a vu naître. »</td></tr>
+      <tr><td style="padding:36px 48px 40px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="background:#D83A27;border-radius:999px;"><a href="https://atelier-braise.fr/#creations" style="display:inline-block;padding:14px 28px;font-family:Inter,Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;color:#F5F0E5;text-decoration:none;">Revoir nos créations</a></td>
+        </tr></table>
+      </td></tr>
+      <tr><td style="padding:24px 48px 32px;border-top:1px solid #3A352F;font-family:Inter,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#C9C1B6;">
+        BRAISE · Gravure laser événementielle · Lyon &amp; Auvergne-Rhône-Alpes<br>
+        <a href="mailto:contact@atelier-braise.fr" style="color:#E5A18C;">contact@atelier-braise.fr</a> · <a href="https://atelier-braise.fr/" style="color:#E5A18C;">atelier-braise.fr</a><br>
+        Vous recevez cet e-mail car vous avez envoyé une demande de devis sur notre site.
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

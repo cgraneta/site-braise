@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /assets/email/
+Sitemap: https://atelier-braise.fr/sitemap.xml
