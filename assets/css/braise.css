@@ -933,3 +933,59 @@ main section,.site-footer{overflow-x:clip}
 @media(prefers-reduced-motion:reduce){
   .button,.engrave-start,.frame,.tile{transition-duration:.01ms!important}
 }
+
+
+/* BRAISE V2.12 — mobile : parcours formulaire → action → résultat */
+.section-mark{display:none!important}
+@media(max-width:900px){
+  #gravure .engrave-studio{display:block}
+  #gravure .engrave-controls{width:100%;max-width:720px;margin-inline:auto}
+  #gravure .engrave-controls .engrave-stage{
+    display:block;width:100%;margin:18px 0 0;min-width:0;
+  }
+  #gravure .engrave-controls .engrave-scene{
+    width:100%;min-height:0!important;aspect-ratio:1.45;
+    padding:clamp(10px,3vw,20px)!important;display:flex;
+    align-items:center;justify-content:center;
+  }
+  #gravure .engrave-controls .engrave-board{
+    width:100%!important;max-width:100%;aspect-ratio:1.5!important;
+    flex:0 0 auto;min-width:0;transform:none!important;
+  }
+  /* La zone du canvas correspond à la surface gravable de la planche,
+     et non au fond noir qui entoure la matière. */
+  #gravure .engrave-controls .engrave-board[data-material="bois"] canvas{
+    left:8%!important;top:13%!important;width:84%!important;height:72%!important;
+  }
+  #gravure .engrave-controls .engrave-board[data-material="metal"] canvas{
+    left:8%!important;top:13%!important;width:84%!important;height:74%!important;
+    position:absolute!important;
+  }
+  #gravure .engrave-controls .engrave-start{margin-bottom:0}
+  #gravure .engrave-controls .engrave-status{margin-top:12px;text-align:center}
+}
+@media(max-width:480px){
+  #gravure .engrave-controls .engrave-scene{aspect-ratio:1.38;padding:10px!important}
+  #gravure .engrave-controls .engrave-board{aspect-ratio:1.5!important}
+  #gravure .engrave-controls .engrave-fonts span{
+    font-size:clamp(10px,2.9vw,13px);overflow-wrap:anywhere;
+  }
+  #gravure .engrave-controls .engrave-fonts label:nth-child(2) span{font-size:clamp(12px,3.4vw,16px)}
+  #gravure .engrave-controls .engrave-fonts label:nth-child(3) span{font-size:clamp(9px,2.65vw,12px)}
+  #gravure{padding-bottom:calc(110px + env(safe-area-inset-bottom))!important}
+}
+
+/* V2.13 — commande animations ON/OFF */
+.motion-toggle{min-height:44px;min-width:126px;cursor:pointer;pointer-events:auto!important;position:relative;z-index:2}
+html[data-motion="on"] .hero-media .hero-video,
+html[data-motion="on"] .hero .hero-media .hero-video{visibility:visible}
+html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="off"] *::after{
+  scroll-behavior:auto!important;animation-duration:.01ms!important;
+  animation-iteration-count:1!important;transition-duration:.01ms!important
+}
+html[data-motion="off"] .motion .gallery .frame,
+html[data-motion="off"] .motion .atelier-grid .frame{opacity:1!important;translate:none!important;clip-path:none!important}
+
+/* V2.13 : animations ON/OFF contrôlées par le bouton */
+.motion-toggle{cursor:pointer;pointer-events:auto!important;min-height:44px;position:relative;z-index:3}
+html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="off"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}

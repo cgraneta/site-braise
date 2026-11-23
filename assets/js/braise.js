@@ -15,26 +15,21 @@
   const finePointer = () => matchMedia('(pointer:fine)').matches;
   const isMobile = () => matchMedia('(max-width:760px)').matches;
 
-  /* --- Préférences d'animation --------------------------------------- */
-  const mq = matchMedia('(prefers-reduced-motion: reduce)');
-  let userOff = false;
-  try { userOff = localStorage.getItem('braise-motion') === 'off'; } catch (e) {}
-  const reduced = () => mq.matches || userOff;
+  /* --- Préférences d'animation : ON par défaut sur tous les écrans --- */
+  const reduced = () => root.dataset.motion === 'off';
   const motionHooks = [];
   function applyMotion() {
     root.classList.toggle('motion', !reduced());
     $$('.motion-toggle').forEach(t => {
-      t.setAttribute('aria-pressed', String(reduced()));
-      t.textContent = reduced() ? 'Réactiver les animations' : 'Réduire les animations';
+      const on = !reduced();
+      t.setAttribute('aria-pressed', String(on));
+      t.setAttribute('aria-label', `Animations : ${on ? 'ON' : 'OFF'}. Cliquer pour ${on ? 'désactiver' : 'activer'}.`);
+      t.textContent = `Animations : ${on ? 'ON' : 'OFF'}`;
     });
     motionHooks.forEach(fn => fn());
   }
-  $$('.motion-toggle').forEach(t => t.addEventListener('click', () => {
-    userOff = !userOff;
-    try { localStorage.setItem('braise-motion', userOff ? 'off' : 'on'); } catch (e) {}
-    applyMotion();
-  }));
-  mq.addEventListener('change', applyMotion);
+  document.addEventListener('braise:motion-change', applyMotion);
+  applyMotion();
 
   /* --- Images : fondu depuis l'aperçu flou ----------------------------- */
   $$('.media img').forEach(img => {
@@ -480,6 +475,19 @@
     const section = $('#gravure'), input = $('#engrave-name'), button = $('.engrave-start'), canvas = $('.engrave-board canvas'), status = $('.engrave-status');
     if (!section || !input || !canvas) return;
     const board = $('.engrave-board'), scene = $('.engrave-scene', section);
+    // Mobile : l'aperçu se place directement sous le bouton de simulation.
+    // Sur écran large, on conserve la composition en deux colonnes.
+    const studio = section.querySelector('.engrave-studio');
+    const controls = section.querySelector('.engrave-controls');
+    const stage = section.querySelector('.engrave-stage');
+    const mobileLayout = window.matchMedia('(max-width:900px)');
+    const arrangeEngraving = () => {
+      if (!studio || !controls || !stage || !button) return;
+      if (mobileLayout.matches) button.insertAdjacentElement('afterend', stage);
+      else studio.insertBefore(stage, controls);
+    };
+    arrangeEngraving();
+    mobileLayout.addEventListener?.('change', arrangeEngraving);
     const selection = name => section.querySelector(`input[name="${name}"]:checked`)?.value || '';
     const fonts = { elegant: 'Marcellus, Georgia, serif', signature: '"Cormorant Garamond", Georgia, serif', modern: 'Inter, Arial, sans-serif' };
     let completed = false;
@@ -528,7 +536,16 @@
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && !completed && input.value.trim()) render(false);
     });
-    button.addEventListener('click', () => {scene?.classList.remove('is-zoomed');render(true);});
+    button.addEventListener('click', () => {
+      scene?.classList.remove('is-zoomed');
+      render(true);
+      if (mobileLayout.matches && input.value.trim() && stage) {
+        // Attendre la mise en page avant d'amener la gravure dans la zone visible.
+        requestAnimationFrame(() => stage.scrollIntoView({
+          behavior: reduced() ? 'instant' : 'smooth', block: 'center'
+        }));
+      }
+    });
     input.addEventListener('input', () => render(false));
     section.querySelectorAll('input[type="radio"]').forEach(radio => radio.addEventListener('change', () => render(false)));
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); render(true); } });
@@ -686,7 +703,7 @@
 (()=>{const mq=matchMedia('(max-width:760px), (pointer:coarse) and (max-width:1024px)');const stage=document.querySelector('.tiles');if(!stage||!document.querySelector('.events-progress'))return;const tiles=[...stage.querySelectorAll('.tile')],dots=[...document.querySelectorAll('.events-progress button')];const active=()=>{if(!mq.matches||document.querySelector('.events').classList.contains('is-orbit'))return;let i=tiles.reduce((best,t,k)=>Math.abs(t.getBoundingClientRect().left-stage.getBoundingClientRect().left)<Math.abs(tiles[best].getBoundingClientRect().left-stage.getBoundingClientRect().left)?k:best,0);dots.forEach((d,k)=>{d.classList.toggle('on',k===i);d.setAttribute('aria-pressed',String(k===i))})};stage.addEventListener('scroll',active,{passive:true});dots.forEach((d,i)=>d.addEventListener('click',()=>{if(mq.matches&&!document.querySelector('.events').classList.contains('is-orbit'))stage.scrollTo({left:tiles[i].offsetLeft-tiles[0].offsetLeft,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'})}));mq.addEventListener('change',active);active();
 const f=document.querySelector('#braiseEventForm'),panels=[...f.querySelectorAll('.mobile-form-panel')],nav=f.querySelector('.mobile-form-nav'),next=nav.querySelector('[data-form-next]'),back=nav.querySelector('[data-form-back]');let step=0;function render(){f.classList.toggle('is-wizard',mq.matches);panels.forEach((p,i)=>p.hidden=mq.matches&&i!==step);nav.querySelector('.mobile-form-progress').textContent=`Étape ${step+1}/3 — ${['Votre événement','Votre projet','Vos coordonnées'][step]}`;back.hidden=step===0;next.hidden=step===2}function move(i){step=i;render();panels[i].querySelector('input,select,textarea')?.focus({preventScroll:true})}next.addEventListener('click',()=>{let invalid=[...panels[step].querySelectorAll('[required]')].find(x=>!x.checkValidity()||(x.minLength>0&&x.value.trim().length<x.minLength));if(invalid){invalid.reportValidity();invalid.focus();return}move(Math.min(2,step+1))});back.addEventListener('click',()=>move(Math.max(0,step-1)));f.addEventListener('submit',e=>{if(!mq.matches)return;if(step<2){e.preventDefault();e.stopImmediatePropagation();next.click();return}let bad=panels.findIndex(p=>[...p.querySelectorAll('[required]')].some(x=>!x.checkValidity()||(x.minLength>0&&x.value.trim().length<x.minLength)));if(bad>=0&&bad!==step)move(bad)},true);document.querySelectorAll('[data-event]').forEach(a=>a.addEventListener('click',()=>{step=0;render()}));mq.addEventListener('change',render);render();})();
 
-(()=>{const v=document.querySelector('.hero-video');if(!v)return;const host=v.closest('.hero-media');const reduced=matchMedia('(prefers-reduced-motion: reduce)');const saveData=()=>!!navigator.connection?.saveData;let visible=true,requested=false;
+(()=>{const v=document.querySelector('.hero-video');if(!v)return;const host=v.closest('.hero-media');const reduced={get matches(){return document.documentElement.dataset.motion==='off'}};const saveData=()=>!!navigator.connection?.saveData;let visible=true,requested=false;
 const hide=()=>host.classList.remove('video-playing');
 const show=()=>{if(!v.paused&&v.readyState>=2&&!reduced.matches)host.classList.add('video-playing')};
 window.braiseVideoDiagnostic=()=>({paused:v.paused,time:v.currentTime,readyState:v.readyState,networkState:v.networkState,error:v.error?.message||null,playError:v.dataset.playError||null,reducedMotion:reduced.matches,visible,saveData:saveData()});
@@ -696,6 +713,6 @@ if(!requested){requested=true;v.preload='metadata';v.load()}
 try{const p=v.play();if(p)p.then(()=>{delete v.dataset.playError;show()}).catch(e=>{v.dataset.playError=e.name+': '+e.message;hide()})}catch(e){v.dataset.playError=e.message;hide()}}
 v.addEventListener('playing',show);v.addEventListener('error',hide);v.addEventListener('pause',hide);
 const io=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();else{v.pause();hide()}},{threshold:.05});io.observe(host);
-window.addEventListener('pageshow',start);document.addEventListener('visibilitychange',start);reduced.addEventListener?.('change',start);
+window.addEventListener('pageshow',start);document.addEventListener('visibilitychange',start);document.addEventListener('braise:motion-change',start);
 document.addEventListener('pointerdown',()=>{if(visible&&v.paused&&!reduced.matches)start()},{passive:true});
 })();
